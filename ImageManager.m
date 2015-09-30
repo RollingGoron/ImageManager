@@ -9,7 +9,6 @@
 #import "ImageManager.h"
 
 static ImageManager *sharedInstance = nil;
-static UIImage *imageToReturn = nil;
 
 @interface ImageManager ()
 
