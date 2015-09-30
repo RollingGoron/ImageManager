@@ -18,7 +18,7 @@ static ImageManager *sharedInstance = nil;
 
 @implementation ImageManager
 
-+(ImageManager *)sharedInfo {
++(instancetype)sharedInfo {
     @synchronized(self) {
         if (sharedInstance == nil) {
             sharedInstance = [[[self class] alloc] init];
@@ -28,13 +28,17 @@ static ImageManager *sharedInstance = nil;
 }
 
 -(id)init {
-    self.imageCache = [[NSCache alloc] init];
+    self = [super init];
+    if (self) {
+        self.imageCache = [[NSCache alloc] init];
+    }
     return self;
 }
 
 /*Downloads and caches images*/
 -(void)asyncImageView:(NSString *)imageURL withKeyName:(NSString *)key withCompletion:(imageManagerBlock)completionBlock {
-    if ([self.imageCache objectForKey:key] == nil) { //Checks for key in cache
+    UIImage *cachedImage = [self.imageCache objectForKey:key];
+    if (cachedImage == nil) { //Checks for counter in cache
         NSURL *downloadImageURL = [NSURL URLWithString:imageURL];
         NSURLRequest *request = [NSURLRequest requestWithURL:downloadImageURL];
         
@@ -42,24 +46,18 @@ static ImageManager *sharedInstance = nil;
         
         NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             UIImage *returnImage = [UIImage imageWithData:data];
-            
-            [self.imageCache setObject:returnImage forKey:key];//Sets the cache with object and key
-            UIImage *image = [self.imageCache objectForKey:key];
-
+            [self.imageCache setObject:returnImage forKey:key];//Sets the cache with the counter object as the key
             if (completionBlock) {
-                completionBlock(YES, nil, image);
+                completionBlock(YES, nil, returnImage);
             }
-
-            
         }];
         
         [dataTask resume];
     } else {
-        UIImage *image = [self.imageCache objectForKey:key];
         if (completionBlock) {
-            completionBlock(YES, nil, image);
+            completionBlock(YES, nil, cachedImage);
         }
-
+        
     }
     
 }
