@@ -3,6 +3,7 @@
 This is a simple image caching class that pulls images from the web and caches them asycnornously.
 
 Import the class:
+
 	#import "ImageManager.h"
 
 Useage:
