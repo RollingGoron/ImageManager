@@ -62,6 +62,47 @@ static ImageManager *sharedInstance = nil;
     
 }
 
+-(void)asyncImageView:(NSString *)imageURL withKeyName:(NSString *)key withPlaceHolderImage:(UIImage *)placeholderImage withCompletion:(imageManagerBlock)completionBlock {
+    
+    
+    
+    UIImage *cachedImage = [self.imageCache objectForKey:key];
+    
+    if (cachedImage == nil) { //Checks for counter in cache
+        NSURL *downloadImageURL = [NSURL URLWithString:imageURL];
+        NSURLRequest *request = [NSURLRequest requestWithURL:downloadImageURL];
+        
+        NSURLSession *session = [NSURLSession sharedSession];
+        
+        NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            UIImage *returnImage = [UIImage imageWithData:data];
+            
+            if (returnImage == nil) {
+                NSLog(@"data is nil");
+                if (completionBlock) {
+                    completionBlock(YES, nil, placeholderImage);
+                }
+                
+                
+            } else {
+                NSLog(@"Data is not nil");
+                [self.imageCache setObject:returnImage forKey:key];//Sets the cache with the counter object as the key
+                if (completionBlock) {
+                    completionBlock(YES, nil, returnImage);
+                }
+            }
+        }];
+        
+        [dataTask resume];
+    } else {
+        if (completionBlock) {
+            completionBlock(YES, nil, cachedImage);
+        }
+        
+    }
+    
+}
+
 
 -(void)clearCache {
     [self.imageCache removeAllObjects];

@@ -14,9 +14,11 @@
 typedef void (^imageManagerBlock) (BOOL success, NSString *error, UIImage *image);
 
 
-+(ImageManager *)sharedInfo;
++(instancetype)sharedInfo;
 
 -(void)asyncImageView:(NSString *)imageURL withKeyName:(NSString *)key withCompletion:(imageManagerBlock)completionBlock;
+-(void)asyncImageView:(NSString *)imageURL withKeyName:(NSString *)key withPlaceHolderImage:(UIImage *)placeholderImage withCompletion:(imageManagerBlock)completionBlock;
+
 -(void)clearCache;
 
 
